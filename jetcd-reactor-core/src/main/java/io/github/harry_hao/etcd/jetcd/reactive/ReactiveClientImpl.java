@@ -21,19 +21,16 @@ public class ReactiveClientImpl implements ReactiveClient {
 
         this.scheduler = builder.scheduler() == null ? Schedulers.newSingle("jetcd-reactor") : builder.scheduler();
 
-        Client client = builder.clientBuilder().build();
+        Client client = builder.client();
 
-        this.kvClient = new MemoizingClientSupplier<>(() -> new ReactiveKVImpl(client.getKVClient(), this.scheduler));
-        this.authClient = new MemoizingClientSupplier<>(() -> new ReactiveAuthImpl(client.getAuthClient(), this.scheduler));
-        this.maintenanceClient = new MemoizingClientSupplier<>(
-            () -> new ReactiveMaintenanceImpl(client.getMaintenanceClient(), this.scheduler));
-        this.clusterClient = new MemoizingClientSupplier<>(
-            () -> new ReactiveClusterImpl(client.getClusterClient(), this.scheduler));
-        this.leaseClient = new MemoizingClientSupplier<>(() -> new ReactiveLeaseImpl(client.getLeaseClient(), this.scheduler));
-        this.watchClient = new MemoizingClientSupplier<>(() -> new ReactiveWatchImpl(client.getWatchClient(), this.scheduler));
-        this.lockClient = new MemoizingClientSupplier<>(() -> new ReactiveLockImpl(client.getLockClient(), this.scheduler));
-        this.electionClient = new MemoizingClientSupplier<>(
-            () -> new ReactiveElectionImpl(client.getElectionClient(), this.scheduler));
+        this.kvClient = new MemoizingClientSupplier<>(() -> new ReactiveKVImpl(client.getKVClient()));
+        this.authClient = new MemoizingClientSupplier<>(() -> new ReactiveAuthImpl(client.getAuthClient()));
+        this.maintenanceClient = new MemoizingClientSupplier<>(() -> new ReactiveMaintenanceImpl(client.getMaintenanceClient()));
+        this.clusterClient = new MemoizingClientSupplier<>(() -> new ReactiveClusterImpl(client.getClusterClient()));
+        this.leaseClient = new MemoizingClientSupplier<>(() -> new ReactiveLeaseImpl(client.getLeaseClient()));
+        this.watchClient = new MemoizingClientSupplier<>(() -> new ReactiveWatchImpl(client.getWatchClient()));
+        this.lockClient = new MemoizingClientSupplier<>(() -> new ReactiveLockImpl(client.getLockClient()));
+        this.electionClient = new MemoizingClientSupplier<>(() -> new ReactiveElectionImpl(client.getElectionClient()));
     }
 
     @Override

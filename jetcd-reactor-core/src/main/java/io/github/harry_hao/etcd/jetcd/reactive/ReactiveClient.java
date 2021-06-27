@@ -1,5 +1,6 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import io.etcd.jetcd.Client;
 import io.etcd.jetcd.ClientBuilder;
 
 /**
@@ -57,7 +58,7 @@ public interface ReactiveClient extends AutoCloseable {
     /**
      * @return a new {@link ClientBuilder}.
      */
-    static ReactiveClientBuilder builder(ClientBuilder clientBuilder) {
-        return new ReactiveClientBuilder(clientBuilder);
+    static ReactiveClientBuilder builder(Client client) {
+        return new ReactiveClientBuilder(client);
     }
 }

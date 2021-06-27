@@ -2,21 +2,20 @@ package io.github.harry_hao.etcd.jetcd.reactive;
 
 import com.google.common.base.Preconditions;
 import io.etcd.jetcd.Client;
-import io.etcd.jetcd.ClientBuilder;
 import reactor.core.scheduler.Scheduler;
 
 public class ReactiveClientBuilder {
-    private ClientBuilder clientBuilder;
+    private Client client;
 
     private Scheduler scheduler;
 
-    public ReactiveClientBuilder(ClientBuilder clientBuilder) {
-        Preconditions.checkNotNull(clientBuilder, "clientBuilder must not be null");
-        this.clientBuilder = clientBuilder;
+    public ReactiveClientBuilder(Client client) {
+        Preconditions.checkNotNull(client, "client must not be null");
+        this.client = client;
     }
 
-    public ClientBuilder clientBuilder() {
-        return this.clientBuilder;
+    public Client client() {
+        return this.client;
     }
 
     public Scheduler scheduler() {
@@ -30,7 +29,6 @@ public class ReactiveClientBuilder {
     }
 
     public ReactiveClient build() {
-        Client client = this.clientBuilder.build();
         return new ReactiveClientImpl(this);
     }
 

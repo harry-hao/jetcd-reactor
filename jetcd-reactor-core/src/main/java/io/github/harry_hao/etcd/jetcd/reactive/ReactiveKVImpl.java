@@ -11,62 +11,58 @@ import io.etcd.jetcd.options.DeleteOption;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 
 public class ReactiveKVImpl implements ReactiveKV {
 
     private KV kv;
 
-    private Scheduler scheduler;
-
-    ReactiveKVImpl(KV kv, Scheduler scheduler) {
+    ReactiveKVImpl(KV kv) {
         this.kv = kv;
-        this.scheduler = scheduler;
     }
 
     @Override
     public Mono<PutResponse> put(ByteSequence key, ByteSequence value) {
-        return Mono.fromFuture(this.kv.put(key, value)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.put(key, value));
     }
 
     @Override
     public Mono<PutResponse> put(ByteSequence key, ByteSequence value, PutOption option) {
-        return Mono.fromFuture(this.kv.put(key, value, option)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.put(key, value, option));
     }
 
     @Override
     public Mono<GetResponse> get(ByteSequence key) {
-        return Mono.fromFuture(this.kv.get(key)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.get(key));
     }
 
     @Override
     public Mono<GetResponse> get(ByteSequence key, GetOption option) {
-        return Mono.fromFuture(this.kv.get(key, option)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.get(key, option));
     }
 
     @Override
     public Mono<DeleteResponse> delete(ByteSequence key) {
-        return Mono.fromFuture(this.kv.delete(key)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.delete(key));
     }
 
     @Override
     public Mono<DeleteResponse> delete(ByteSequence key, DeleteOption option) {
-        return Mono.fromFuture(this.kv.delete(key, option)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.delete(key, option));
     }
 
     @Override
     public Mono<CompactResponse> compact(long rev) {
-        return Mono.fromFuture(this.kv.compact(rev)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.compact(rev));
     }
 
     @Override
     public Mono<CompactResponse> compact(long rev, CompactOption option) {
-        return Mono.fromFuture(this.kv.compact(rev, option)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.kv.compact(rev, option));
     }
 
     @Override
     public ReactiveTxn txn() {
-        return new ReactiveTxnImpl(this.kv.txn(), this.scheduler);
+        return new ReactiveTxnImpl(this.kv.txn());
     }
 
     @Override

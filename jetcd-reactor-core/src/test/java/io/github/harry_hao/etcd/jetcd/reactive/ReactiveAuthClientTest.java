@@ -1,149 +1,274 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
-import java.net.URI;
-import java.time.Duration;
-import java.util.List;
-
+import io.etcd.jetcd.Auth;
 import io.etcd.jetcd.ByteSequence;
-import io.etcd.jetcd.Client;
-import io.etcd.jetcd.ClientBuilder;
+import io.etcd.jetcd.auth.AuthDisableResponse;
+import io.etcd.jetcd.auth.AuthEnableResponse;
+import io.etcd.jetcd.auth.AuthRoleAddResponse;
+import io.etcd.jetcd.auth.AuthRoleDeleteResponse;
 import io.etcd.jetcd.auth.AuthRoleGetResponse;
+import io.etcd.jetcd.auth.AuthRoleGrantPermissionResponse;
 import io.etcd.jetcd.auth.AuthRoleListResponse;
-import io.etcd.jetcd.auth.Permission;
-import io.etcd.jetcd.test.EtcdClusterExtension;
-import org.junit.jupiter.api.BeforeAll;
+import io.etcd.jetcd.auth.AuthRoleRevokePermissionResponse;
+import io.etcd.jetcd.auth.AuthUserAddResponse;
+import io.etcd.jetcd.auth.AuthUserChangePasswordResponse;
+import io.etcd.jetcd.auth.AuthUserDeleteResponse;
+import io.etcd.jetcd.auth.AuthUserGetResponse;
+import io.etcd.jetcd.auth.AuthUserGrantRoleResponse;
+import io.etcd.jetcd.auth.AuthUserListResponse;
+import io.etcd.jetcd.auth.AuthUserRevokeRoleResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import reactor.test.StepVerifier;
 
-import static io.github.harry_hao.etcd.jetcd.reactive.TestUtil.bytesOf;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import static io.etcd.jetcd.auth.Permission.Type.READ;
+import static io.etcd.jetcd.auth.Permission.Type.READWRITE;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ReactiveAuthClientTest {
+    private Auth auth;
 
-    @RegisterExtension
-    public static EtcdClusterExtension cluster = new EtcdClusterExtension("auth-etcd", 1, false);
+    private ReactiveAuth reactiveAuth;
 
-    private final ByteSequence rootRoleKey = bytesOf("root");
-    private final ByteSequence rootRoleValue = bytesOf("b");
-    private final ByteSequence rootRoleKeyRangeBegin = bytesOf("root");
-    private final ByteSequence rootRoleKeyRangeEnd = bytesOf("root1");
-
-    private final ByteSequence userRoleKey = bytesOf("foo");
-    private final ByteSequence userRoleValue = bytesOf("bar");
-    private final ByteSequence userRoleKeyRangeBegin = bytesOf("foo");
-    private final ByteSequence userRoleKeyRangeEnd = bytesOf("foo1");
-
-    private final String rootString = "root";
-    private final ByteSequence root = bytesOf(rootString);
-    private final ByteSequence rootPass = bytesOf("123");
-    private final String rootRoleString = "root";
-    private final ByteSequence rootRole = bytesOf(rootRoleString);
-
-    private final String userString = "user";
-    private final ByteSequence user = bytesOf(userString);
-    private final ByteSequence userPass = bytesOf("userPass");
-    private final ByteSequence userNewPass = bytesOf("newUserPass");
-    private final String userRoleString = "userRole";
-    private final ByteSequence userRole = bytesOf(userRoleString);
-
-    private static ReactiveAuth authDisabledAuthClient;
-    private static ReactiveKV authDisabledKVClient;
-
-    private static List<URI> endpoints;
-    private static Duration timeout = Duration.ofSeconds(1);
-
-    /**
-     * Build etcd client to create role, permission.
-     */
-    @BeforeAll
-    public static void setupEnv() {
-        ReactiveAuthClientTest.endpoints = ReactiveAuthClientTest.cluster.getClientEndpoints();
-        ClientBuilder clientBuilder = Client.builder().endpoints(endpoints);
-        ReactiveClient client = ReactiveClient.builder(clientBuilder).build();
-
-        authDisabledKVClient = client.getKVClient();
-        authDisabledAuthClient = client.getAuthClient();
+    @BeforeEach
+    void setup() {
+        this.auth = mock(Auth.class);
+        this.reactiveAuth = new ReactiveAuthImpl(this.auth);
     }
 
     @Test
-    public void testAuth() throws Exception {
-        authDisabledAuthClient.roleAdd(rootRole).block(timeout);
-        authDisabledAuthClient.roleAdd(userRole).block(timeout);
+    void testAuthEnable() {
+        AuthEnableResponse response = mock(AuthEnableResponse.class);
+        CompletableFuture<AuthEnableResponse> future = new CompletableFuture<>();
+        when(this.auth.authEnable()).thenReturn(future);
 
-        final AuthRoleListResponse response = authDisabledAuthClient.roleList().block(timeout);
+        this.reactiveAuth.authEnable()
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        assertThat(response.getRoles()).containsOnly(rootRoleString, userRoleString);
+    @Test
+    void testAuthDisable() {
+        AuthDisableResponse response = mock(AuthDisableResponse.class);
+        CompletableFuture<AuthDisableResponse> future = new CompletableFuture<>();
+        when(this.auth.authDisable()).thenReturn(future);
 
-        authDisabledAuthClient
-            .roleGrantPermission(rootRole, rootRoleKeyRangeBegin, rootRoleKeyRangeEnd, Permission.Type.READWRITE)
-            .block(timeout);
-        authDisabledAuthClient
-            .roleGrantPermission(userRole, userRoleKeyRangeBegin, userRoleKeyRangeEnd, Permission.Type.READWRITE)
-            .block(timeout);
+        this.reactiveAuth.authDisable()
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        authDisabledAuthClient.userAdd(root, rootPass).block(timeout);
-        authDisabledAuthClient.userAdd(user, userPass).block(timeout);
+    @Test
+    void testUserAdd() {
+        AuthUserAddResponse response = mock(AuthUserAddResponse.class);
+        CompletableFuture<AuthUserAddResponse> future = new CompletableFuture<>();
+        ByteSequence user = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        ByteSequence password = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        when(this.auth.userAdd(user, password)).thenReturn(future);
 
-        authDisabledAuthClient.userChangePassword(user, userNewPass).block(timeout);
+        this.reactiveAuth.userAdd(user, password)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        List<String> users = authDisabledAuthClient.userList().block(timeout).getUsers();
-        assertThat(users).containsOnly(rootString, userString);
+    @Test
+    void testUserDelete() {
+        AuthUserDeleteResponse response = mock(AuthUserDeleteResponse.class);
+        CompletableFuture<AuthUserDeleteResponse> future = new CompletableFuture<>();
+        ByteSequence user = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        when(this.auth.userDelete(user)).thenReturn(future);
 
-        authDisabledAuthClient.userGrantRole(root, rootRole).block(timeout);
-        authDisabledAuthClient.userGrantRole(user, rootRole).block(timeout);
-        authDisabledAuthClient.userGrantRole(user, userRole).block(timeout);
+        this.reactiveAuth.userDelete(user)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        assertThat(authDisabledAuthClient.userGet(root).block(timeout).getRoles()).containsOnly(rootRoleString);
-        assertThat(authDisabledAuthClient.userGet(user).block(timeout).getRoles()).containsOnly(rootRoleString, userRoleString);
+    @Test
+    void testUserChangePassword() {
+        AuthUserChangePasswordResponse response = mock(AuthUserChangePasswordResponse.class);
+        CompletableFuture<AuthUserChangePasswordResponse> future = new CompletableFuture<>();
+        ByteSequence user = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        ByteSequence password = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        when(this.auth.userChangePassword(user, password)).thenReturn(future);
 
-        authDisabledAuthClient.authEnable().block(timeout);
+        this.reactiveAuth.userChangePassword(user, password)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        final ClientBuilder userClientBuilder = Client.builder().endpoints(endpoints).user(user).password(userNewPass);
-        final ClientBuilder rootClientBuilder = Client.builder().endpoints(endpoints).user(root).password(rootPass);
+    @Test
+    void testUserGet() {
+        AuthUserGetResponse response = mock(AuthUserGetResponse.class);
+        CompletableFuture<AuthUserGetResponse> future = new CompletableFuture<>();
+        ByteSequence user = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        when(this.auth.userGet(user)).thenReturn(future);
 
-        final ReactiveClient userClient = ReactiveClient.builder(userClientBuilder).build();
-        final ReactiveClient rootClient = ReactiveClient.builder(rootClientBuilder).build();
+        this.reactiveAuth.userGet(user)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        userClient.getKVClient().put(rootRoleKey, rootRoleValue).block(timeout);
-        userClient.getKVClient().put(userRoleKey, userRoleValue).block(timeout);
-        userClient.getKVClient().get(rootRoleKey).block(timeout);
-        userClient.getKVClient().get(userRoleKey).block(timeout);
+    @Test
+    void testUserList() {
+        AuthUserListResponse response = mock(AuthUserListResponse.class);
+        CompletableFuture<AuthUserListResponse> future = new CompletableFuture<>();
+        when(this.auth.userList()).thenReturn(future);
 
-        assertThatThrownBy(() -> authDisabledKVClient.put(rootRoleKey, rootRoleValue).block(timeout))
-            .hasMessageContaining("etcdserver: user name is empty");
-        assertThatThrownBy(() -> authDisabledKVClient.put(userRoleKey, rootRoleValue).block(timeout))
-            .hasMessageContaining("etcdserver: user name is empty");
-        assertThatThrownBy(() -> authDisabledKVClient.get(rootRoleKey).block(timeout))
-            .hasMessageContaining("etcdserver: user name is empty");
-        assertThatThrownBy(() -> authDisabledKVClient.get(userRoleKey).block(timeout))
-            .hasMessageContaining("etcdserver: user name is empty");
+        this.reactiveAuth.userList()
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        AuthRoleGetResponse roleGetResponse = userClient.getAuthClient().roleGet(rootRole).block(timeout);
-        assertThat(roleGetResponse.getPermissions().size()).isNotEqualTo(0);
+    @Test
+    void testUserGrantRole() {
+        AuthUserGrantRoleResponse response = mock(AuthUserGrantRoleResponse.class);
+        CompletableFuture<AuthUserGrantRoleResponse> future = new CompletableFuture<>();
+        ByteSequence user = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        ByteSequence role = ByteSequence.from("root", UTF_8);
+        when(this.auth.userGrantRole(user, role)).thenReturn(future);
 
-        roleGetResponse = userClient.getAuthClient().roleGet(userRole).block(timeout);
-        assertThat(roleGetResponse.getPermissions().size()).isNotEqualTo(0);
+        this.reactiveAuth.userGrantRole(user, role)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        rootClient.getAuthClient().userRevokeRole(user, rootRole).block(timeout);
+    @Test
+    void testUserRevokeRole() {
+        AuthUserRevokeRoleResponse response = mock(AuthUserRevokeRoleResponse.class);
+        CompletableFuture<AuthUserRevokeRoleResponse> future = new CompletableFuture<>();
+        ByteSequence user = ByteSequence.from(UUID.randomUUID().toString(), UTF_8);
+        ByteSequence role = ByteSequence.from("root", UTF_8);
+        when(this.auth.userRevokeRole(user, role)).thenReturn(future);
 
-        final ReactiveKV kvClient = userClient.getKVClient();
-        // verify the access to root role is revoked for user.
-        assertThatThrownBy(() -> kvClient.get(rootRoleKey).block(timeout)).isNotNull();
-        // verify userRole is still valid.
-        assertThat(kvClient.get(userRoleKey).block(timeout).getCount()).isNotEqualTo(0);
+        this.reactiveAuth.userRevokeRole(user, role)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        rootClient.getAuthClient().roleRevokePermission(userRole, userRoleKeyRangeBegin, userRoleKeyRangeEnd).block(timeout);
+    @Test
+    void testRoleAdd() {
+        AuthRoleAddResponse response = mock(AuthRoleAddResponse.class);
+        CompletableFuture<AuthRoleAddResponse> future = new CompletableFuture<>();
+        ByteSequence role = ByteSequence.from("root", UTF_8);
+        when(this.auth.roleAdd(role)).thenReturn(future);
 
-        // verify the access to foo is revoked for user.
-        assertThatThrownBy(() -> userClient.getKVClient().get(userRoleKey).block(timeout)).isNotNull();
+        this.reactiveAuth.roleAdd(role)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        rootClient.getAuthClient().authDisable().block(timeout);
+    @Test
+    void testRoleGrantPermission() {
+        AuthRoleGrantPermissionResponse response = mock(AuthRoleGrantPermissionResponse.class);
+        CompletableFuture<AuthRoleGrantPermissionResponse> future = new CompletableFuture<>();
+        ByteSequence role = ByteSequence.from("root", UTF_8);
+        ByteSequence key = ByteSequence.from("key1", UTF_8);
+        ByteSequence rangeEnd = ByteSequence.from("key2", UTF_8);
+        when(this.auth.roleGrantPermission(role, key, rangeEnd, READ)).thenReturn(future);
 
-        authDisabledAuthClient.userDelete(root).block(timeout);
-        authDisabledAuthClient.userDelete(user).block(timeout);
+        this.reactiveAuth.roleGrantPermission(role, key, rangeEnd, READ)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
 
-        authDisabledAuthClient.roleDelete(rootRole).block(timeout);
-        authDisabledAuthClient.roleDelete(userRole).block(timeout);
+    @Test
+    void testRoleGet() {
+        AuthRoleGetResponse response = mock(AuthRoleGetResponse.class);
+        CompletableFuture<AuthRoleGetResponse> future = new CompletableFuture<>();
+        ByteSequence role = ByteSequence.from("root", UTF_8);
+        when(this.auth.roleGet(role)).thenReturn(future);
+
+        this.reactiveAuth.roleGet(role)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
+
+    @Test
+    void testRoleList() {
+        AuthRoleListResponse response = mock(AuthRoleListResponse.class);
+        CompletableFuture<AuthRoleListResponse> future = new CompletableFuture<>();
+        when(this.auth.roleList()).thenReturn(future);
+
+        this.reactiveAuth.roleList()
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
+
+    @Test
+    void testRoleRevokePermission() {
+        AuthRoleRevokePermissionResponse response = mock(AuthRoleRevokePermissionResponse.class);
+        CompletableFuture<AuthRoleRevokePermissionResponse> future = new CompletableFuture<>();
+        ByteSequence role = ByteSequence.from("root", UTF_8);
+        ByteSequence key = ByteSequence.from("key1", UTF_8);
+        ByteSequence rangeEnd = ByteSequence.from("key2", UTF_8);
+        when(this.auth.roleRevokePermission(role, key, rangeEnd)).thenReturn(future);
+
+        this.reactiveAuth.roleRevokePermission(role, key, rangeEnd)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
+    }
+
+    @Test
+    void testRoleDelete() {
+        AuthRoleDeleteResponse response = mock(AuthRoleDeleteResponse.class);
+        CompletableFuture<AuthRoleDeleteResponse> future = new CompletableFuture<>();
+        ByteSequence role = ByteSequence.from("root", UTF_8);
+        when(this.auth.roleDelete(role)).thenReturn(future);
+
+        this.reactiveAuth.roleDelete(role)
+                .as(StepVerifier::create)
+                .expectSubscription()
+                .then(() -> future.complete(response))
+                .expectNext(response)
+                .verifyComplete();
     }
 }
+

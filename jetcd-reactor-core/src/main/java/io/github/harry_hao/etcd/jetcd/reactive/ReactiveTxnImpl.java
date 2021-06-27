@@ -5,17 +5,13 @@ import io.etcd.jetcd.kv.TxnResponse;
 import io.etcd.jetcd.op.Cmp;
 import io.etcd.jetcd.op.Op;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 
 public class ReactiveTxnImpl implements ReactiveTxn {
 
     private Txn txn;
 
-    private Scheduler scheduler;
-
-    ReactiveTxnImpl(Txn txn, Scheduler scheduler) {
+    ReactiveTxnImpl(Txn txn) {
         this.txn = txn;
-        this.scheduler = scheduler;
     }
 
     @Override
@@ -35,6 +31,6 @@ public class ReactiveTxnImpl implements ReactiveTxn {
 
     @Override
     public Mono<TxnResponse> commit() {
-        return Mono.fromFuture(this.txn.commit()).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.txn.commit());
     }
 }

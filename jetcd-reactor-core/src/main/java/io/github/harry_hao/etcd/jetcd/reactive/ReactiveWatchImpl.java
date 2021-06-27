@@ -5,17 +5,13 @@ import io.etcd.jetcd.Watch;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.watch.WatchResponse;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Scheduler;
 
 public class ReactiveWatchImpl implements ReactiveWatch {
 
     private Watch watch;
 
-    private Scheduler scheduler;
-
-    ReactiveWatchImpl(Watch watch, Scheduler scheduler) {
+    ReactiveWatchImpl(Watch watch) {
         this.watch = watch;
-        this.scheduler = scheduler;
     }
 
     @Override
@@ -38,7 +34,7 @@ public class ReactiveWatchImpl implements ReactiveWatch {
                 }
             });
             sink.onCancel(() -> watcher.close());
-        }).subscribeOn(this.scheduler);
+        });
     }
 
     @Override

@@ -9,57 +9,55 @@ import io.etcd.jetcd.election.ProclaimResponse;
 import io.etcd.jetcd.election.ResignResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 
 public class ReactiveElectionImpl implements ReactiveElection {
 
     private Election election;
 
-    private Scheduler scheduler;
-
-    ReactiveElectionImpl(Election election, Scheduler scheduler) {
+    ReactiveElectionImpl(Election election) {
         this.election = election;
-        this.scheduler = scheduler;
     }
 
     @Override
     public Mono<CampaignResponse> campaign(ByteSequence electionName, long leaseId, ByteSequence proposal) {
-        return Mono.fromFuture(this.election.campaign(electionName, leaseId, proposal)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.election.campaign(electionName, leaseId, proposal));
     }
 
     @Override
     public Mono<ProclaimResponse> proclaim(LeaderKey leaderKey, ByteSequence proposal) {
-        return Mono.fromFuture(this.election.proclaim(leaderKey, proposal)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.election.proclaim(leaderKey, proposal));
     }
 
     @Override
     public Mono<LeaderResponse> leader(ByteSequence electionName) {
-        return Mono.fromFuture(this.election.leader(electionName)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.election.leader(electionName));
     }
 
     @Override
     public Flux<LeaderResponse> observe(ByteSequence electionName) {
-        return Flux.<LeaderResponse> create(sink -> this.election.observe(electionName, new Election.Listener() {
-            @Override
-            public void onNext(LeaderResponse leaderResponse) {
-                sink.next(leaderResponse);
-            }
+        return Flux.create(sink -> {
+            this.election.observe(electionName, new Election.Listener() {
+                @Override
+                public void onNext(LeaderResponse leaderResponse) {
+                    sink.next(leaderResponse);
+                }
 
-            @Override
-            public void onError(Throwable throwable) {
-                sink.error(throwable);
-            }
+                @Override
+                public void onError(Throwable throwable) {
+                    sink.error(throwable);
+                }
 
-            @Override
-            public void onCompleted() {
-                sink.complete();
-            }
-        })).subscribeOn(this.scheduler);
+                @Override
+                public void onCompleted() {
+                    sink.complete();
+                }
+            });
+        });
     }
 
     @Override
     public Mono<ResignResponse> resign(LeaderKey leaderKey) {
-        return Mono.fromFuture(this.election.resign(leaderKey)).subscribeOn(this.scheduler);
+        return Mono.fromFuture(this.election.resign(leaderKey));
     }
 
     @Override
