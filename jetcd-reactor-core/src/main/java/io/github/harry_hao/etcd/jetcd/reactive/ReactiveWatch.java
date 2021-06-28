@@ -18,8 +18,7 @@ public interface ReactiveWatch extends CloseableClient {
      *
      * @param  key                   key to be watched on.
      * @param  option                see {@link io.etcd.jetcd.options.WatchOption}.
-     * @return                       this watcher
-     * @throws ClosedClientException if watch client has been closed.
+     * @return                       {@code Flux<WatchResponse>}
      */
     Flux<WatchResponse> watch(ByteSequence key, WatchOption option);
 
@@ -27,11 +26,9 @@ public interface ReactiveWatch extends CloseableClient {
      * watch on a key.
      *
      * @param  key                   key to be watched on.
-     * @param  listener              the event consumer
-     * @return                       this watcher
-     * @throws ClosedClientException if watch client has been closed.
+     * @return                       {@code Flux<WatchResponse>}
      **/
-    default Flux<WatchResponse> watch(ByteSequence key, Watch.Listener listener) {
+    default Flux<WatchResponse> watch(ByteSequence key) {
         return watch(key, WatchOption.DEFAULT);
     }
 

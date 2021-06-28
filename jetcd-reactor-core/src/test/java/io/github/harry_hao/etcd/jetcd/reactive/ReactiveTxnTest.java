@@ -1,12 +1,8 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
-import io.etcd.jetcd.Client;
 import io.etcd.jetcd.Txn;
-import io.etcd.jetcd.api.TxnRequest;
 import io.etcd.jetcd.kv.TxnResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ReactiveTxnTest {
+class ReactiveTxnTest {
 
     @Test
     void testTxnCommit() {

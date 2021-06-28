@@ -21,17 +21,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static io.etcd.jetcd.auth.Permission.Type.READ;
-import static io.etcd.jetcd.auth.Permission.Type.READWRITE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ReactiveAuthClientTest {
+class ReactiveAuthTest {
+
     private Auth auth;
 
     private ReactiveAuth reactiveAuth;
