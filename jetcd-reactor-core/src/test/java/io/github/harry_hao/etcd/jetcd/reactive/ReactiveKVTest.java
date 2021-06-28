@@ -1,5 +1,7 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.util.concurrent.CompletableFuture;
+
 import io.etcd.jetcd.ByteSequence;
 import io.etcd.jetcd.Client;
 import io.etcd.jetcd.KV;
@@ -13,14 +15,12 @@ import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import reactor.test.StepVerifier;
 
-import java.util.concurrent.CompletableFuture;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mockito.Mockito.*;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ReactiveKVTest {
 
@@ -50,10 +50,10 @@ class ReactiveKVTest {
         when(this.kv.put(this.key, this.value)).thenReturn(future);
 
         this.reactiveKv.put(this.key, this.value).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(putResponse))
-                .expectNext(putResponse)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(putResponse))
+            .expectNext(putResponse)
+            .verifyComplete();
     }
 
     @Test
@@ -64,10 +64,10 @@ class ReactiveKVTest {
         when(this.kv.put(this.key, this.value, PutOption.DEFAULT)).thenReturn(future);
 
         this.reactiveKv.put(this.key, this.value, PutOption.DEFAULT).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(putResponse))
-                .expectNext(putResponse)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(putResponse))
+            .expectNext(putResponse)
+            .verifyComplete();
     }
 
     @Test
@@ -77,11 +77,11 @@ class ReactiveKVTest {
         when(kv.get(key)).thenReturn(future);
 
         reactiveKv.get(this.key).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(getResponse))
-                .expectNext(getResponse)
-                .expectComplete()
-                .verify();
+            .expectSubscription()
+            .then(() -> future.complete(getResponse))
+            .expectNext(getResponse)
+            .expectComplete()
+            .verify();
     }
 
     @Test
@@ -92,10 +92,10 @@ class ReactiveKVTest {
         when(kv.get(this.key, GetOption.DEFAULT)).thenReturn(future);
 
         this.reactiveKv.get(this.key, GetOption.DEFAULT).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(getResponse))
-                .expectNext(getResponse)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(getResponse))
+            .expectNext(getResponse)
+            .verifyComplete();
     }
 
     @Test
@@ -105,10 +105,10 @@ class ReactiveKVTest {
         when(kv.delete(this.key)).thenReturn(future);
 
         this.reactiveKv.delete(this.key).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(deleteResponse))
-                .expectNext(deleteResponse)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(deleteResponse))
+            .expectNext(deleteResponse)
+            .verifyComplete();
     }
 
     void testKVDeleteOption() {
@@ -117,10 +117,10 @@ class ReactiveKVTest {
         when(kv.delete(this.key, DeleteOption.DEFAULT)).thenReturn(future);
 
         this.reactiveKv.delete(this.key, DeleteOption.DEFAULT).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(deleteResponse))
-                .expectNext(deleteResponse)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(deleteResponse))
+            .expectNext(deleteResponse)
+            .verifyComplete();
     }
 
     @Test
@@ -131,10 +131,10 @@ class ReactiveKVTest {
         when(kv.compact(rev)).thenReturn(future);
 
         this.reactiveKv.compact(rev).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(compactResponse))
-                .expectNext(compactResponse)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(compactResponse))
+            .expectNext(compactResponse)
+            .verifyComplete();
     }
 
     @Test
@@ -145,12 +145,11 @@ class ReactiveKVTest {
         when(kv.compact(rev, CompactOption.DEFAULT)).thenReturn(future);
 
         this.reactiveKv.compact(rev, CompactOption.DEFAULT)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(compactResponse))
-                .expectNext(compactResponse)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(compactResponse))
+            .expectNext(compactResponse)
+            .verifyComplete();
     }
-
 
 }

@@ -1,5 +1,10 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.net.URI;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import io.etcd.jetcd.Cluster;
 import io.etcd.jetcd.cluster.MemberAddResponse;
 import io.etcd.jetcd.cluster.MemberListResponse;
@@ -9,20 +14,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.net.URI;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ReactiveClusterTest {
 
     private Cluster cluster;
-    
-    private ReactiveCluster reactiveCluster;
 
+    private ReactiveCluster reactiveCluster;
 
     @BeforeEach
     void setUp() throws InterruptedException {
@@ -37,11 +36,11 @@ class ReactiveClusterTest {
         when(this.cluster.listMember()).thenReturn(future);
 
         this.reactiveCluster.listMember()
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -52,11 +51,11 @@ class ReactiveClusterTest {
         when(this.cluster.addMember(endpoints)).thenReturn(future);
 
         this.reactiveCluster.addMember(endpoints)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -66,11 +65,11 @@ class ReactiveClusterTest {
         when(this.cluster.removeMember(1L)).thenReturn(future);
 
         this.reactiveCluster.removeMember(1L)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -81,10 +80,10 @@ class ReactiveClusterTest {
         when(this.cluster.updateMember(1L, endpoints)).thenReturn(future);
 
         this.reactiveCluster.updateMember(1L, endpoints)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 }

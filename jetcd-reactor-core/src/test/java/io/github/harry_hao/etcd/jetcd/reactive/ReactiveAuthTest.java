@@ -1,5 +1,8 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import io.etcd.jetcd.Auth;
 import io.etcd.jetcd.ByteSequence;
 import io.etcd.jetcd.auth.AuthDisableResponse;
@@ -21,11 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static io.etcd.jetcd.auth.Permission.Type.READ;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,11 +49,11 @@ class ReactiveAuthTest {
         when(this.auth.authEnable()).thenReturn(future);
 
         this.reactiveAuth.authEnable()
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -62,11 +63,11 @@ class ReactiveAuthTest {
         when(this.auth.authDisable()).thenReturn(future);
 
         this.reactiveAuth.authDisable()
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -78,11 +79,11 @@ class ReactiveAuthTest {
         when(this.auth.userAdd(user, password)).thenReturn(future);
 
         this.reactiveAuth.userAdd(user, password)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -93,11 +94,11 @@ class ReactiveAuthTest {
         when(this.auth.userDelete(user)).thenReturn(future);
 
         this.reactiveAuth.userDelete(user)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -109,11 +110,11 @@ class ReactiveAuthTest {
         when(this.auth.userChangePassword(user, password)).thenReturn(future);
 
         this.reactiveAuth.userChangePassword(user, password)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -124,11 +125,11 @@ class ReactiveAuthTest {
         when(this.auth.userGet(user)).thenReturn(future);
 
         this.reactiveAuth.userGet(user)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -138,11 +139,11 @@ class ReactiveAuthTest {
         when(this.auth.userList()).thenReturn(future);
 
         this.reactiveAuth.userList()
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -154,11 +155,11 @@ class ReactiveAuthTest {
         when(this.auth.userGrantRole(user, role)).thenReturn(future);
 
         this.reactiveAuth.userGrantRole(user, role)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -170,11 +171,11 @@ class ReactiveAuthTest {
         when(this.auth.userRevokeRole(user, role)).thenReturn(future);
 
         this.reactiveAuth.userRevokeRole(user, role)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -185,11 +186,11 @@ class ReactiveAuthTest {
         when(this.auth.roleAdd(role)).thenReturn(future);
 
         this.reactiveAuth.roleAdd(role)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -202,11 +203,11 @@ class ReactiveAuthTest {
         when(this.auth.roleGrantPermission(role, key, rangeEnd, READ)).thenReturn(future);
 
         this.reactiveAuth.roleGrantPermission(role, key, rangeEnd, READ)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -217,11 +218,11 @@ class ReactiveAuthTest {
         when(this.auth.roleGet(role)).thenReturn(future);
 
         this.reactiveAuth.roleGet(role)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -231,11 +232,11 @@ class ReactiveAuthTest {
         when(this.auth.roleList()).thenReturn(future);
 
         this.reactiveAuth.roleList()
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -248,11 +249,11 @@ class ReactiveAuthTest {
         when(this.auth.roleRevokePermission(role, key, rangeEnd)).thenReturn(future);
 
         this.reactiveAuth.roleRevokePermission(role, key, rangeEnd)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -263,11 +264,10 @@ class ReactiveAuthTest {
         when(this.auth.roleDelete(role)).thenReturn(future);
 
         this.reactiveAuth.roleDelete(role)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 }
-

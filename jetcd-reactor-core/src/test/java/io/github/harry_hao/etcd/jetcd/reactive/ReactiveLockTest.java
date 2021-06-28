@@ -1,5 +1,8 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import io.etcd.jetcd.ByteSequence;
 import io.etcd.jetcd.Lock;
 import io.etcd.jetcd.lock.LockResponse;
@@ -8,10 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,11 +35,11 @@ public class ReactiveLockTest {
         when(this.lock.lock(name, 1L)).thenReturn(future);
 
         this.reactiveLock.lock(name, 1L)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -49,10 +50,10 @@ public class ReactiveLockTest {
         when(this.lock.unlock(lockKey)).thenReturn(future);
 
         this.reactiveLock.unlock(lockKey)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 }

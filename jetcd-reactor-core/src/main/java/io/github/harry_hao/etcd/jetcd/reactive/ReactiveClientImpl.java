@@ -25,7 +25,8 @@ public class ReactiveClientImpl implements ReactiveClient {
 
         this.kvClient = new MemoizingClientSupplier<>(() -> new ReactiveKVImpl(client.getKVClient()));
         this.authClient = new MemoizingClientSupplier<>(() -> new ReactiveAuthImpl(client.getAuthClient()));
-        this.maintenanceClient = new MemoizingClientSupplier<>(() -> new ReactiveMaintenanceImpl(client.getMaintenanceClient()));
+        this.maintenanceClient = new MemoizingClientSupplier<>(
+            () -> new ReactiveMaintenanceImpl(client.getMaintenanceClient()));
         this.clusterClient = new MemoizingClientSupplier<>(() -> new ReactiveClusterImpl(client.getClusterClient()));
         this.leaseClient = new MemoizingClientSupplier<>(() -> new ReactiveLeaseImpl(client.getLeaseClient()));
         this.watchClient = new MemoizingClientSupplier<>(() -> new ReactiveWatchImpl(client.getWatchClient()));

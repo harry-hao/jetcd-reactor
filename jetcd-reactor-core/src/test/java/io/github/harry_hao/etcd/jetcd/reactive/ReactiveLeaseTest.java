@@ -1,5 +1,8 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import io.etcd.jetcd.Lease;
 import io.etcd.jetcd.lease.LeaseGrantResponse;
 import io.etcd.jetcd.lease.LeaseKeepAliveResponse;
@@ -13,10 +16,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import reactor.test.StepVerifier;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ReactiveLeaseTest {
     private Lease lease;
@@ -37,11 +39,11 @@ public class ReactiveLeaseTest {
         when(this.lease.grant(ttl)).thenReturn(future);
 
         this.reactiveLease.grant(ttl)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -53,11 +55,11 @@ public class ReactiveLeaseTest {
         when(this.lease.grant(ttl, timeout, TimeUnit.SECONDS)).thenReturn(future);
 
         this.reactiveLease.grant(ttl, timeout, TimeUnit.SECONDS)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -67,11 +69,11 @@ public class ReactiveLeaseTest {
         when(this.lease.revoke(1L)).thenReturn(future);
 
         this.reactiveLease.revoke(1L)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -81,11 +83,11 @@ public class ReactiveLeaseTest {
         when(this.lease.keepAliveOnce(1L)).thenReturn(future);
 
         this.reactiveLease.keepAliveOnce(1L)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -95,11 +97,11 @@ public class ReactiveLeaseTest {
         when(this.lease.timeToLive(1L, LeaseOption.DEFAULT)).thenReturn(future);
 
         this.reactiveLease.timeToLive(1L, LeaseOption.DEFAULT)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -108,18 +110,18 @@ public class ReactiveLeaseTest {
         LeaseKeepAliveResponse response2 = mock(LeaseKeepAliveResponse.class);
 
         this.reactiveLease.keepAlive(1L)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> {
-                    ArgumentCaptor<StreamObserver<LeaseKeepAliveResponse>> captor = ArgumentCaptor.forClass(StreamObserver.class);
-                    verify(this.lease).keepAlive(Mockito.same(1L), captor.capture());
-                    StreamObserver<LeaseKeepAliveResponse> streamObserver = captor.getValue();
-                    streamObserver.onNext(response1);
-                    streamObserver.onNext(response2);
-                    streamObserver.onCompleted();
-                })
-                .expectNext(response1)
-                .expectNext(response2)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> {
+                ArgumentCaptor<StreamObserver> captor = ArgumentCaptor.forClass(StreamObserver.class);
+                verify(this.lease).keepAlive(Mockito.same(1L), captor.capture());
+                StreamObserver<LeaseKeepAliveResponse> streamObserver = captor.getValue();
+                streamObserver.onNext(response1);
+                streamObserver.onNext(response2);
+                streamObserver.onCompleted();
+            })
+            .expectNext(response1)
+            .expectNext(response2)
+            .verifyComplete();
     }
 }

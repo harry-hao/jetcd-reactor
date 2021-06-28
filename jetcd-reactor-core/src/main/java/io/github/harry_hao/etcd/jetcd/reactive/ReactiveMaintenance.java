@@ -1,5 +1,8 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.io.OutputStream;
+import java.net.URI;
+
 import io.etcd.jetcd.maintenance.AlarmMember;
 import io.etcd.jetcd.maintenance.AlarmResponse;
 import io.etcd.jetcd.maintenance.DefragmentResponse;
@@ -10,9 +13,6 @@ import io.etcd.jetcd.maintenance.StatusResponse;
 import io.etcd.jetcd.support.CloseableClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.io.OutputStream;
-import java.net.URI;
 
 /**
  * Interface of maintenance talking to etcd.

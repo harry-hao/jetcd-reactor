@@ -1,5 +1,9 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.concurrent.CompletableFuture;
+
 import io.etcd.jetcd.Maintenance;
 import io.etcd.jetcd.maintenance.AlarmMember;
 import io.etcd.jetcd.maintenance.AlarmResponse;
@@ -14,11 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import reactor.test.StepVerifier;
 
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.concurrent.CompletableFuture;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ReactiveMaintenanceTest {
 
@@ -39,11 +41,11 @@ class ReactiveMaintenanceTest {
         when(this.maintenance.listAlarms()).thenReturn(future);
 
         this.reactiveMaintenance.listAlarms()
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -52,13 +54,13 @@ class ReactiveMaintenanceTest {
         AlarmMember alarmMember = mock(AlarmMember.class);
         CompletableFuture<AlarmResponse> future = new CompletableFuture<>();
         when(this.maintenance.alarmDisarm(alarmMember)).thenReturn(future);
-        
+
         this.reactiveMaintenance.alarmDisarm(alarmMember)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -69,11 +71,11 @@ class ReactiveMaintenanceTest {
         when(this.maintenance.defragmentMember(endpoint)).thenReturn(future);
 
         this.reactiveMaintenance.defragmentMember(endpoint)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -84,11 +86,11 @@ class ReactiveMaintenanceTest {
         when(this.maintenance.statusMember(endpoint)).thenReturn(future);
 
         this.reactiveMaintenance.statusMember(endpoint)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -99,11 +101,11 @@ class ReactiveMaintenanceTest {
         when(this.maintenance.hashKV(endpoint, 0L)).thenReturn(future);
 
         this.reactiveMaintenance.hashKV(endpoint, 0L)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -113,11 +115,11 @@ class ReactiveMaintenanceTest {
         when(this.maintenance.snapshot(out)).thenReturn(future);
 
         this.reactiveMaintenance.snapshot(out)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(1L))
-                .expectNext(1L)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(1L))
+            .expectNext(1L)
+            .verifyComplete();
     }
 
     @Test
@@ -126,18 +128,18 @@ class ReactiveMaintenanceTest {
         SnapshotResponse response2 = mock(SnapshotResponse.class);
 
         this.reactiveMaintenance.snapshot()
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> {
-                    ArgumentCaptor<StreamObserver<SnapshotResponse>> captor = ArgumentCaptor.forClass(StreamObserver.class);
-                    verify(this.maintenance).snapshot(captor.capture());
-                    StreamObserver<SnapshotResponse> observer = captor.getValue();
-                    observer.onNext(response1);
-                    observer.onNext(response2);
-                    observer.onCompleted();
-                })
-                .expectNext(response1, response2)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> {
+                ArgumentCaptor<StreamObserver> captor = ArgumentCaptor.forClass(StreamObserver.class);
+                verify(this.maintenance).snapshot(captor.capture());
+                StreamObserver<SnapshotResponse> observer = captor.getValue();
+                observer.onNext(response1);
+                observer.onNext(response2);
+                observer.onCompleted();
+            })
+            .expectNext(response1, response2)
+            .verifyComplete();
     }
 
     @Test
@@ -147,10 +149,10 @@ class ReactiveMaintenanceTest {
         when(this.maintenance.moveLeader(1L)).thenReturn(future);
 
         this.reactiveMaintenance.moveLeader(1L)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 }

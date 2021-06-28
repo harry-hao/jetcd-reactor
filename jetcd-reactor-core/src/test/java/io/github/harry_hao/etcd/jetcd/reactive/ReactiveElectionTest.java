@@ -1,5 +1,8 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import io.etcd.jetcd.ByteSequence;
 import io.etcd.jetcd.Client;
 import io.etcd.jetcd.Election;
@@ -15,12 +18,11 @@ import org.mockito.Mockito;
 import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ReactiveElectionTest {
 
@@ -52,10 +54,10 @@ public class ReactiveElectionTest {
         when(this.election.campaign(this.electionName, leaseId, proposal)).thenReturn(future);
 
         this.reactiveElection.campaign(this.electionName, leaseId, proposal).as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -67,11 +69,11 @@ public class ReactiveElectionTest {
         when(this.election.proclaim(leaderKey, proposal)).thenReturn(future);
 
         this.reactiveElection.proclaim(leaderKey, proposal)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
     }
 
     @Test
@@ -82,11 +84,11 @@ public class ReactiveElectionTest {
         when(this.election.leader(this.electionName)).thenReturn(future);
 
         this.reactiveElection.leader(this.electionName)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(response))
-                .expectNext(response)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(response))
+            .expectNext(response)
+            .verifyComplete();
 
     }
 
@@ -96,19 +98,19 @@ public class ReactiveElectionTest {
         LeaderResponse response2 = mock(LeaderResponse.class);
 
         this.reactiveElection.observe(this.electionName)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> {
-                    ArgumentCaptor<Election.Listener> listenerCaptor = ArgumentCaptor.forClass(Election.Listener.class);
-                    verify(this.election).observe(Mockito.any(ByteSequence.class), listenerCaptor.capture());
-                    Election.Listener listener = listenerCaptor.getValue();
-                    listener.onNext(response1);
-                    listener.onNext(response2);
-                    listener.onCompleted();
-                })
-                .expectNext(response1)
-                .expectNext(response2)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> {
+                ArgumentCaptor<Election.Listener> listenerCaptor = ArgumentCaptor.forClass(Election.Listener.class);
+                verify(this.election).observe(Mockito.any(ByteSequence.class), listenerCaptor.capture());
+                Election.Listener listener = listenerCaptor.getValue();
+                listener.onNext(response1);
+                listener.onNext(response2);
+                listener.onCompleted();
+            })
+            .expectNext(response1)
+            .expectNext(response2)
+            .verifyComplete();
     }
 
     @Test
@@ -119,11 +121,11 @@ public class ReactiveElectionTest {
         when(this.election.resign(leaderKey)).thenReturn(future);
 
         this.reactiveElection.resign(leaderKey)
-                .as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(resignResponse))
-                .expectNext(resignResponse)
-                .verifyComplete();
+            .as(StepVerifier::create)
+            .expectSubscription()
+            .then(() -> future.complete(resignResponse))
+            .expectNext(resignResponse)
+            .verifyComplete();
     }
 
 }

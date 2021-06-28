@@ -1,5 +1,7 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.util.concurrent.TimeUnit;
+
 import io.etcd.jetcd.Lease;
 import io.etcd.jetcd.lease.LeaseGrantResponse;
 import io.etcd.jetcd.lease.LeaseKeepAliveResponse;
@@ -10,8 +12,6 @@ import io.etcd.jetcd.support.CloseableClient;
 import io.grpc.stub.StreamObserver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.concurrent.TimeUnit;
 
 public class ReactiveLeaseImpl implements ReactiveLease {
 

@@ -1,11 +1,11 @@
 package io.github.harry_hao.etcd.jetcd.reactive;
 
+import java.util.concurrent.CompletableFuture;
+
 import io.etcd.jetcd.Txn;
 import io.etcd.jetcd.kv.TxnResponse;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
-
-import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,9 +22,9 @@ class ReactiveTxnTest {
         when(txn.commit()).thenReturn(future);
 
         reactiveTxn.commit().as(StepVerifier::create)
-                .expectSubscription()
-                .then(() -> future.complete(txnResponse))
-                .expectNext(txnResponse)
-                .verifyComplete();
+            .expectSubscription()
+            .then(() -> future.complete(txnResponse))
+            .expectNext(txnResponse)
+            .verifyComplete();
     }
 }
